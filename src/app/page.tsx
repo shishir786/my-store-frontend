@@ -1,20 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-export default function Home() {
+const Home = () => {
   const [domain, setDomain] = useState('');
   const [isDomainAvailable, setIsDomainAvailable] = useState<boolean | null>(null);
   const [isChecking, setIsChecking] = useState(false);
   const [storeInfo, setStoreInfo] = useState({
     name: '',
-    currency: 'BDT',
+    currency: 'BDT (Taka)',
     country: 'Bangladesh',
     domain: '',
-    category: '',
+    category: 'Fashion',
     email: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,7 +46,7 @@ export default function Home() {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setStoreInfo({ ...storeInfo, [name]: value });
   };
@@ -75,162 +75,230 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Create Your Online Store
-            </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300">
-              Get started with your e-commerce journey in minutes
-            </p>
-          </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+        <div className="p-8">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Create a store</h1>
+          <p className="text-gray-600 dark:text-gray-300 mb-8">Add your basic store information and complete the setup</p>
           
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-8">
-            <div className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">
-                Check Domain Availability
-              </h2>
-              
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-grow">
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={domain}
-                      onChange={handleDomainChange}
-                      onBlur={checkDomainAvailability}
-                      placeholder="Enter your desired domain"
-                      className={`w-full px-4 py-3 rounded-lg border ${isDomainAvailable === false ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-300 dark:border-gray-600'} focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white`}
-                      disabled={isChecking}
-                    />
-                    {isChecking && (
-                      <div className="absolute right-3 top-3">
-                        <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full"></div>
-                      </div>
-                    )}
-                  </div>
-                  {isDomainAvailable === true && (
-                    <p className="mt-2 text-green-600 dark:text-green-400 text-sm flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      Domain is available!
-                    </p>
-                  )}
-                  {isDomainAvailable === false && (
-                    <p className="mt-2 text-red-600 dark:text-red-400 text-sm flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                      Domain is already taken. Please try another.
-                    </p>
-                  )}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Store Name */}
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0 mt-1">
+                <div className="w-6 h-6 rounded-md bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                  <Image src="/file.svg" alt="Store" width={16} height={16} className="dark:invert" />
                 </div>
-                <button
-                  onClick={checkDomainAvailability}
-                  disabled={!domain || isChecking}
-                  className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                >
-                  {isChecking ? 'Checking...' : 'Check Availability'}
-                </button>
+              </div>
+              <div className="flex-grow">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Give your online store a name
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  A great store name is a big part of your success. Make sure it aligns with your brand and products.
+                </p>
+                <input
+                  type="text"
+                  name="name"
+                  value={storeInfo.name}
+                  onChange={handleInputChange}
+                  placeholder="How'd you like to call your store?"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white"
+                  required
+                />
               </div>
             </div>
-            
-            {isDomainAvailable && (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">
-                  Complete Store Registration
-                </h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Store Name
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={storeInfo.name}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={storeInfo.email}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Store Category
-                    </label>
-                    <input
-                      type="text"
-                      id="category"
-                      name="category"
-                      value={storeInfo.category}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="domain" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Domain
-                    </label>
-                    <input
-                      type="text"
-                      id="domain"
-                      value={domain}
-                      disabled
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-600 text-gray-500 dark:text-gray-400"
-                    />
-                  </div>
+
+            {/* Domain */}
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0 mt-1">
+                <div className="w-6 h-6 rounded-md bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                  <Image src="/globe.svg" alt="Domain" width={16} height={16} className="dark:invert" />
                 </div>
-                
-                {error && (
-                  <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400 text-sm">
-                    {error}
-                  </div>
+              </div>
+              <div className="flex-grow">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Your online store subdomain
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  A SEO-friendly store name is a crucial part of your success. Make sure it aligns with your brand and products.
+                </p>
+                <div className="flex">
+                  <input
+                    type="text"
+                    value={domain}
+                    onChange={handleDomainChange}
+                    onBlur={checkDomainAvailability}
+                    placeholder="enter your domain name"
+                    className="flex-grow px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-l-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white"
+                    required
+                  />
+                  <span className="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-600 text-gray-500 dark:text-gray-300 rounded-r-md">
+                    expressitbd.com
+                  </span>
+                </div>
+                {isDomainAvailable === true && (
+                  <p className="mt-2 text-green-600 dark:text-green-400 text-xs flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Domain is available!
+                  </p>
                 )}
-                
-                <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="px-8 py-3 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                        Creating Store...
-                      </>
-                    ) : (
-                      'Create Store'
-                    )}
-                  </button>
+                {isDomainAvailable === false && (
+                  <p className="mt-2 text-red-600 dark:text-red-400 text-xs flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Domain is already taken. Please try another.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Location */}
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0 mt-1">
+                <div className="w-6 h-6 rounded-md bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                  <Image src="/window.svg" alt="Location" width={16} height={16} className="dark:invert" />
                 </div>
-              </form>
+              </div>
+              <div className="flex-grow">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Where's your store located?
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  Set your store's default location so we can optimize store access and speed for your customers.
+                </p>
+                <select
+                  name="country"
+                  value={storeInfo.country}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="Bangladesh">Bangladesh</option>
+                  <option value="India">India</option>
+                  <option value="United States">United States</option>
+                  <option value="United Kingdom">United Kingdom</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Category */}
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0 mt-1">
+                <div className="w-6 h-6 rounded-md bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                </div>
+              </div>
+              <div className="flex-grow">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  What's your Category?
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  Set your store's default category so that we can optimize store access and speed for your customers.
+                </p>
+                <select
+                  name="category"
+                  value={storeInfo.category}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="Fashion">Fashion</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Home & Garden">Home & Garden</option>
+                  <option value="Beauty & Personal Care">Beauty & Personal Care</option>
+                  <option value="Food & Beverage">Food & Beverage</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Currency */}
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0 mt-1">
+                <div className="w-6 h-6 rounded-md bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+              <div className="flex-grow">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Choose store currency
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  This is the main currency you wish to sell in.
+                </p>
+                <select
+                  name="currency"
+                  value={storeInfo.currency}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="BDT (Taka)">BDT (Taka)</option>
+                  <option value="USD">USD (US Dollar)</option>
+                  <option value="EUR">EUR (Euro)</option>
+                  <option value="GBP">GBP (British Pound)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Email */}
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0 mt-1">
+                <div className="w-6 h-6 rounded-md bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              </div>
+              <div className="flex-grow">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Store contact email
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  This is the email you'll use to send notifications to and receive orders from customers.
+                </p>
+                <input
+                  type="email"
+                  name="email"
+                  value={storeInfo.email}
+                  onChange={handleInputChange}
+                  placeholder="you@example.com"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white"
+                  required
+                />
+              </div>
+            </div>
+
+            {error && (
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md text-red-600 dark:text-red-400 text-sm">
+                {error}
+              </div>
             )}
-          </div>
+
+            <div className="flex justify-end pt-4">
+              <button
+                type="submit"
+                disabled={isSubmitting || !isDomainAvailable}
+                className="px-6 py-2 bg-primary text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2 inline-block"></div>
+                    Creating Store...
+                  </>
+                ) : (
+                  'Create store'
+                )}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
   );
 }
+
+export default Home;
