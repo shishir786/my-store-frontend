@@ -6,12 +6,14 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'i.imgur.com',
-        pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'api.escuelajs.co',
-        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.pinimg.com',
       },
     ],
   },

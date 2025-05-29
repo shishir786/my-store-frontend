@@ -107,6 +107,7 @@ export default function Footer() {
                 placeholder="Your email" 
                 className="px-4 py-2 w-full rounded-l-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white text-sm"
                 required
+                suppressHydrationWarning
               />
               <button 
                 type="submit" 
