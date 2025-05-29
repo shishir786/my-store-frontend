@@ -35,8 +35,9 @@ const Home = () => {
     setError('');
     
     try {
-      const response = await axios.get(`https://api.escuelajs.co/api/v1/users/is-available?domain=${domain}`);
-      setIsDomainAvailable(!response.data.taken);
+      // Using the correct API endpoint provided by the user
+      const response = await axios.get(`https://interview-task-green.vercel.app/task/domains/check/${domain}.expressitbd.com`);
+      setIsDomainAvailable(!response.data.data.taken);
     } catch (err) {
       console.error('Error checking domain:', err);
       setError('Failed to check domain availability. Please try again.');
@@ -63,7 +64,11 @@ const Home = () => {
     setError('');
     
     try {
-      await axios.post('https://api.escuelajs.co/api/v1/users', storeInfo);
+      // Using the correct API endpoint for store creation
+      const response = await axios.post('https://interview-task-green.vercel.app/task/stores/create', {
+        data: storeInfo
+      });
+      console.log('Store creation response:', response.data);
       // After successful registration, redirect to products page
       router.push(`/products?domain=${domain}`);
     } catch (err) {
@@ -188,7 +193,7 @@ const Home = () => {
               <div className="flex-shrink-0 mt-1">
                 <div className="w-6 h-6 rounded-md bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2 2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                   </svg>
                 </div>
               </div>
