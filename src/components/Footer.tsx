@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 
-export default function Footer() {
+const Footer = () => {
   return (
     <footer className="bg-neutral text-neutral-content">
       <div className="container mx-auto px-4 py-12">
@@ -87,3 +87,5 @@ export default function Footer() {
     </footer>
   );
 }
+
+export default Footer;

@@ -66,13 +66,14 @@ const Home = () => {
       return;
     }
 
-    if (!storeInfo.email.trim()) {
-      setError('Email is required');
+    // Validate store name minimum length
+    if (storeInfo.name.trim().length < 3) {
+      setError('Store name must be at least 3 characters long.');
       return;
     }
 
-    if (!storeInfo.domain.trim()) {
-      setError('Domain is required');
+    if (!storeInfo.email.trim()) {
+      setError('Email is required');
       return;
     }
 
@@ -87,12 +88,11 @@ const Home = () => {
     setError('');
     
     try {
-      // Format the data exactly as specified by the user
       const storeData = {
         name: storeInfo.name.trim(),
-        currency: storeInfo.currency.split(' ')[0], // Extract just the currency code (e.g., "BDT")
+        currency: storeInfo.currency.split(' ')[0], 
         country: storeInfo.country,
-        domain: domain.trim(), // Use only the user-entered subdomain
+        domain: domain.trim(), 
         category: storeInfo.category,
         email: storeInfo.email.trim()
       };
@@ -111,7 +111,6 @@ const Home = () => {
 
       console.log('API Response:', response.data);
 
-      // Check if the API reported success (either via success flag or specific message)
       if (response.data.success || response.data.message === "Store created successfully!") {
         console.log('Store creation successful, navigating...');
         // Navigate to the products page on success

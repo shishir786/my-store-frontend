@@ -17,7 +17,7 @@ interface Product {
   };
 }
 
-export default function ProductDetailPage() {
+const ProductDetailPage = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -226,4 +226,6 @@ export default function ProductDetailPage() {
       </div>
     </div>
   );
-}
+};
+
+export default ProductDetailPage;
