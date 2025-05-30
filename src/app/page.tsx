@@ -5,6 +5,13 @@ import axios from 'axios';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
+interface ApiError {
+  message?: string;
+  response?: {
+    data?: unknown;
+  };
+}
+
 const Home = () => {
   const [domain, setDomain] = useState('');
   const [isDomainAvailable, setIsDomainAvailable] = useState<boolean | null>(null);
@@ -121,12 +128,14 @@ const Home = () => {
         console.error('API reported an error:', apiErrorMessage);
         setError(apiErrorMessage);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error during store creation process:', err);
-      console.error('Error response details:', err.response?.data);
+      if (axios.isAxiosError(err)) {
+        console.error('Error response details:', err.response?.data);
+      }
 
       // Handle network errors or unexpected issues during the request
-      const errorMessage = err.message || 'An unexpected error occurred. Please try again.';
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.';
       setError(`Request failed: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
@@ -163,7 +172,7 @@ const Home = () => {
                   name="name"
                   value={storeInfo.name}
                   onChange={handleInputChange}
-                  placeholder="How'd you like to call your store?"
+                  placeholder="How&apos;d you like to call your store?"
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white"
                   required
                 />
@@ -235,10 +244,10 @@ const Home = () => {
               </div>
               <div className="flex-grow">
                 <label htmlFor="country" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Where's your store located?
+                  Where&apos;s your store located?
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                  Set your store's default location so we can optimize store access and speed for your customers.
+                  Set your store&apos;s default location so we can optimize store access and speed for your customers.
                 </p>
               </div>
               <div className="w-100 flex-shrink-0">
@@ -268,10 +277,10 @@ const Home = () => {
               </div>
               <div className="flex-grow">
                 <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  What's your Category?
+                  What&apos;s your Category?
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                  Set your store's default category so that we can optimize store access and speed for your customers.
+                  Set your store&apos;s default category so that we can optimize store access and speed for your customers.
                 </p>
               </div>
               <div className="w-100 flex-shrink-0">
@@ -338,7 +347,7 @@ const Home = () => {
                   Store contact email
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                  This is the email you'll use to send notifications to and receive orders from customers.
+                  This is the email you&apos;ll use to send notifications to and receive orders from customers.
                 </p>
               </div>
               <div className="w-100 flex-shrink-0">
