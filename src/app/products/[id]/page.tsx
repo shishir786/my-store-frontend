@@ -1,22 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
 interface Product {
-  id: number;
+  _id: string;
   title: string;
-  price: number;
   description: string;
-  category: {
-    id: number;
-    name: string;
-    image: string;
-  };
+  price: number;
   images: string[];
+  category?: {
+    _id: string;
+    name: string;
+  };
 }
 
 export default function ProductDetailPage() {
@@ -31,19 +29,30 @@ export default function ProductDetailPage() {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`https://api.escuelajs.co/api/v1/products/${productId}`);
-        setProduct(response.data);
+        const response = await fetch(`https://glore-bd-backend-node-mongo.vercel.app/api/product/${productId}`);
+        
+        if (!response.ok) {
+          console.error('Product API failed response status:', response.status);
+          try {
+            const errorBody = await response.text();
+            console.error('Product API failed response body:', errorBody);
+          } catch (bodyErr) {
+            console.error('Could not read Product API failed response body:', bodyErr);
+          }
+          throw new Error('Failed to fetch product');
+        }
+        
+        const data = await response.json();
+        setProduct(data);
       } catch (err) {
-        console.error('Error fetching product:', err);
+        console.error('Error loading product:', err);
         setError('Failed to load product details. Please try again.');
       } finally {
         setLoading(false);
       }
     };
-    
-    if (productId) {
-      fetchProduct();
-    }
+
+    fetchProduct();
   }, [productId]);
   
   if (loading) {
@@ -90,7 +99,7 @@ export default function ProductDetailPage() {
               <span className="mx-2">/</span>
             </li>
             <li>
-              <Link href={`/products?category=${product.category?.id}`} className="hover:text-primary transition-colors">
+              <Link href={`/products?category=${product.category?._id}`} className="hover:text-primary transition-colors">
                 {product.category?.name || 'Uncategorized'}
               </Link>
             </li>
@@ -203,7 +212,7 @@ export default function ProductDetailPage() {
                     </svg>
                     Add to Cart
                   </button>
-                  <button className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center">
+                  <button className="px-6 py-3 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-colors flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>

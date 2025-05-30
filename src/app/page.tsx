@@ -59,23 +59,76 @@ const Home = () => {
       setError('Please choose an available domain first.');
       return;
     }
+
+    // Validate required fields
+    if (!storeInfo.name.trim()) {
+      setError('Store name is required');
+      return;
+    }
+
+    if (!storeInfo.email.trim()) {
+      setError('Email is required');
+      return;
+    }
+
+    if (!storeInfo.domain.trim()) {
+      setError('Domain is required');
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(storeInfo.email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
     
     setIsSubmitting(true);
     setError('');
     
     try {
-      // Using the correct API endpoint for store creation
+      // Format the data exactly as specified by the user
       const storeData = {
-        ...storeInfo,
-        domain: `${domain}.expressitbd.com`
+        name: storeInfo.name.trim(),
+        currency: storeInfo.currency.split(' ')[0], // Extract just the currency code (e.g., "BDT")
+        country: storeInfo.country,
+        domain: domain.trim(), // Use only the user-entered subdomain
+        category: storeInfo.category,
+        email: storeInfo.email.trim()
       };
-      const response = await axios.post('https://interview-task-green.vercel.app/task/stores/create', storeData);
-      console.log('Store creation response:', response.data);
-      // After successful registration, redirect to products page
-      router.push(`/products?domain=${domain}`);
-    } catch (err) {
-      console.error('Error creating store:', err);
-      setError('Failed to create store. Please try again.');
+
+      console.log('Sending store data:', JSON.stringify(storeData, null, 2)); // Debug log
+
+      const response = await axios.post(
+        'https://interview-task-green.vercel.app/task/stores/create',
+        storeData,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      console.log('API Response:', response.data);
+
+      // Check if the API reported success (either via success flag or specific message)
+      if (response.data.success || response.data.message === "Store created successfully!") {
+        console.log('Store creation successful, navigating...');
+        // Navigate to the products page on success
+        router.push(`/products?domain=${storeInfo.domain.trim()}`);
+      } else {
+        // If success is false and the message is not the success message, display the error message from the API
+        const apiErrorMessage = response.data.message || 'Failed to create store. Please try again.';
+        console.error('API reported an error:', apiErrorMessage);
+        setError(apiErrorMessage);
+      }
+    } catch (err: any) {
+      console.error('Error during store creation process:', err);
+      console.error('Error response details:', err.response?.data);
+
+      // Handle network errors or unexpected issues during the request
+      const errorMessage = err.message || 'An unexpected error occurred. Please try again.';
+      setError(`Request failed: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -83,8 +136,8 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-        <div className="p-8">
+      <div className="max-w-5xl w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+        <div className="p-12">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Create a store</h1>
           <p className="text-gray-600 dark:text-gray-300 mb-8">Add your basic store information and complete the setup</p>
           
@@ -97,13 +150,16 @@ const Home = () => {
                 </div>
               </div>
               <div className="flex-grow">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Give your online store a name
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                   A great store name is a big part of your success. Make sure it aligns with your brand and products.
                 </p>
+              </div>
+              <div className="w-100 flex-shrink-0">
                 <input
+                  id="name"
                   type="text"
                   name="name"
                   value={storeInfo.name}
@@ -123,28 +179,34 @@ const Home = () => {
                 </div>
               </div>
               <div className="flex-grow">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label htmlFor="domain" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Your online store subdomain
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                   A SEO-friendly store name is a crucial part of your success. Make sure it aligns with your brand and products.
                 </p>
-                <div className="flex">
+              </div>
+              <div className="w-100 flex-shrink-0 flex flex-col">
+                <div className="flex items-center">
                   <input
+                    id="domain"
                     type="text"
                     value={domain}
                     onChange={handleDomainChange}
                     onBlur={checkDomainAvailability}
                     placeholder="enter your domain name"
-                    className="flex-grow px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-l-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-l-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white"
                     required
                   />
                   <span className="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-600 text-gray-500 dark:text-gray-300 rounded-r-md">
                     expressitbd.com
                   </span>
                 </div>
+                {isChecking && (
+                  <p className="mt-1 text-sm text-gray-500">Checking availability...</p>
+                )}
                 {isDomainAvailable === true && (
-                  <p className="mt-2 text-green-600 dark:text-green-400 text-xs flex items-center">
+                  <p className="mt-1 text-sm text-green-600 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
@@ -152,7 +214,7 @@ const Home = () => {
                   </p>
                 )}
                 {isDomainAvailable === false && (
-                  <p className="mt-2 text-red-600 dark:text-red-400 text-xs flex items-center">
+                  <p className="mt-1 text-sm text-red-600 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -166,17 +228,23 @@ const Home = () => {
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0 mt-1">
                 <div className="w-6 h-6 rounded-md bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                  <Image src="/window.svg" alt="Location" width={16} height={16} className="dark:invert" />
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
                 </div>
               </div>
               <div className="flex-grow">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label htmlFor="country" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Where's your store located?
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                   Set your store's default location so we can optimize store access and speed for your customers.
                 </p>
+              </div>
+              <div className="w-100 flex-shrink-0">
                 <select
+                  id="country"
                   name="country"
                   value={storeInfo.country}
                   onChange={handleInputChange}
@@ -200,13 +268,16 @@ const Home = () => {
                 </div>
               </div>
               <div className="flex-grow">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   What's your Category?
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                   Set your store's default category so that we can optimize store access and speed for your customers.
                 </p>
+              </div>
+              <div className="w-100 flex-shrink-0">
                 <select
+                  id="category"
                   name="category"
                   value={storeInfo.category}
                   onChange={handleInputChange}
@@ -231,13 +302,16 @@ const Home = () => {
                 </div>
               </div>
               <div className="flex-grow">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label htmlFor="currency" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Choose store currency
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                   This is the main currency you wish to sell in.
                 </p>
+              </div>
+              <div className="w-100 flex-shrink-0">
                 <select
+                  id="currency"
                   name="currency"
                   value={storeInfo.currency}
                   onChange={handleInputChange}
@@ -261,13 +335,16 @@ const Home = () => {
                 </div>
               </div>
               <div className="flex-grow">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Store contact email
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                   This is the email you'll use to send notifications to and receive orders from customers.
                 </p>
+              </div>
+              <div className="w-100 flex-shrink-0">
                 <input
+                  id="email"
                   type="email"
                   name="email"
                   value={storeInfo.email}
