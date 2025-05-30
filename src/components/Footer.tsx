@@ -54,7 +54,7 @@ const Footer = () => {
 
           {/* Newsletter */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Stay Updated</h3>
+            <h3 className="text-lg font-semibold">Stay Updated with Us</h3>
             <p className="text-sm opacity-80">Subscribe to our newsletter for the latest updates and offers.</p>
             <form className="space-y-3">
               <div className="flex flex-col space-y-2">
