@@ -1,6 +1,3 @@
-import Link from 'next/link';
-import Image from 'next/image';
-
 const Footer = () => {
   return (
     <footer className="bg-neutral text-neutral-content">

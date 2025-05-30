@@ -17,6 +17,26 @@ interface Product {
   };
 }
 
+interface ProductImage {
+  secure_url: string;
+}
+
+interface ApiProduct {
+  _id: string;
+  title: string;
+  description: string;
+  price: string | number;
+  images: ProductImage[];
+  category?: {
+    _id: string;
+    name: string;
+  };
+}
+
+interface ApiResponse {
+  data: ApiProduct[];
+}
+
 const ProductsPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +46,7 @@ const ProductsPage = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`https://glore-bd-backend-node-mongo.vercel.app/api/product`);
+        const response = await axios.get<ApiResponse>(`https://glore-bd-backend-node-mongo.vercel.app/api/product`);
 
         const data = response.data;
 
@@ -34,24 +54,24 @@ const ProductsPage = () => {
         console.log('Products API Response Headers:', response.headers);
         
         if (data && Array.isArray(data.data)) {
-          const productsData = data.data.map((product: any) => ({
+          const productsData = data.data.map((product: ApiProduct) => ({
             ...product,
-            price: parseFloat(product.price) || 0,
+            price: parseFloat(product.price.toString()) || 0,
             images: Array.isArray(product.images)
                       ? product.images
-                          .map((image: any) => image?.secure_url)
+                          .map((image: ProductImage) => image?.secure_url)
                           .filter((url: string | undefined) => url)
                       : [],
           }));
           setProducts(productsData);
           console.log('Products state updated with processed data (price converted, images processed).');
         } else if (Array.isArray(data)) {
-           const productsData = data.map((product: any) => ({
+           const productsData = data.map((product: ApiProduct) => ({
             ...product,
-            price: parseFloat(product.price) || 0,
+            price: parseFloat(product.price.toString()) || 0,
              images: Array.isArray(product.images)
                       ? product.images
-                          .map((image: any) => image?.secure_url)
+                          .map((image: ProductImage) => image?.secure_url)
                           .filter((url: string | undefined) => url)
                       : [],
           }));
@@ -63,9 +83,11 @@ const ProductsPage = () => {
           setProducts([]);
         }
 
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error loading products:', err);
-        console.error('Error response details:', err.response?.data);
+        if (axios.isAxiosError(err)) {
+          console.error('Error response details:', err.response?.data);
+        }
         setError('Failed to load products. Please try again.');
         setProducts([]);
       } finally {
