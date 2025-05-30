@@ -65,9 +65,11 @@ const Home = () => {
     
     try {
       // Using the correct API endpoint for store creation
-      const response = await axios.post('https://interview-task-green.vercel.app/task/stores/create', {
-        data: storeInfo
-      });
+      const storeData = {
+        ...storeInfo,
+        domain: `${domain}.expressitbd.com`
+      };
+      const response = await axios.post('https://interview-task-green.vercel.app/task/stores/create', storeData);
       console.log('Store creation response:', response.data);
       // After successful registration, redirect to products page
       router.push(`/products?domain=${domain}`);
